@@ -53,6 +53,15 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Revealed only once the background image has loaded */
+    body.ready .overlay {
+      opacity: 1;
+      visibility: visible;
     }
 
     /* Popup */
@@ -66,6 +75,9 @@
       position: relative;
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.28),
                   0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    body.ready .popup {
       animation: popIn 0.32s cubic-bezier(0.34, 1.46, 0.64, 1) both;
     }
 
@@ -251,8 +263,27 @@
     function goNo() {
       window.location.href = no;
     }
+
+    // Reveal the popup only after the background image has loaded,
+    // so the dialog never appears over a blank page.
+    (function () {
+      var mobile = 'https://ik.imagekit.io/bpopon66m/mos-mob.webp';
+      var desktop = 'https://ik.imagekit.io/bpopon66m/mos-desk.webp';
+      var src = window.matchMedia('(min-width: 768px)').matches ? desktop : mobile;
+
+      function reveal() {
+        document.body.classList.add('ready');
+      }
+
+      var img = new Image();
+      img.onload = reveal;
+      img.onerror = reveal; // don't trap the user if the image fails
+      img.src = src;
+
+      if (img.complete) reveal();           // cached image
+      setTimeout(reveal, 2500);             // safety fallback
+    })();
   </script>
 
 </body>
 </html>
-```
